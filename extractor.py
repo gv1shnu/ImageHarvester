@@ -9,6 +9,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+import urllib.request
 
 
 class Extractor:
@@ -49,16 +50,42 @@ class ImageExtractor(Extractor):
         return {x: urls}
 
     def get_images_from_pinterest_page(self, url):
+        def reach_for_highest_resolution(srt):
+            return srt[:21] + 'originals' + srt[21 + srt[21:].index('/'):]
+
         driver = webdriver.Chrome(service=self.driver_service, options=self.chrome_options)
         driver.get(url)
         elem1 = driver.find_elements(By.CLASS_NAME, 'GrowthUnauthPinImage__Image')
         sub = []
         for i in elem1:
-            sub.append(i.get_attribute('src'))
+            x = i.get_attribute('src')
+            try:
+                x = reach_for_highest_resolution(str(x))
+            except Exception:
+                pass
+            sub.append(x)
         return {url.split('/')[3]: sub}
 
     def get_images_from_reddit_page(self, url):
-        pass
+        ans = []
+        try:
+            weburl = urllib.request.urlopen(url)
+            data = str(weburl.read()).split()
+
+            ext = '___'
+            for i in data:
+                if ('.jpg' in i) and ('https://' in i) and (('redd' in i) or ('imgur' in i)):
+                    ext = 'jpg'
+                if ('.png' in i) and ('https://' in i) and \
+                        ((('redd' in i) or ('imgur' in i)) and 'redditstatic' not in i):
+                    ext = 'png'
+
+                link = i[i.index('https://'): i.index('.' + ext) + 4]
+                ans.append(link)
+        except Exception as z:
+            pass
+
+        return ans
 
 
 class LinkExtractor(Extractor):
@@ -134,3 +161,21 @@ class LinkExtractor(Extractor):
 def get_domain(url):
     parsed_url = urlparse(url)
     return parsed_url.netloc
+
+
+def is_valid(url):
+    """
+    Checks whether `url` is a valid URL.
+    """
+    parsed = urlparse(url)
+    return bool(parsed.netloc) and bool(parsed.scheme)
+
+
+def scroll(driver, X=3, _wait=10, _sleep=2):
+    value = 0
+    print('Scrolling...')
+    for i in range(X):
+        driver.execute_script("scrollBy(" + str(value) + ",+1000);")
+        value += _wait
+        time.sleep(_sleep)
+    # The above code is just to scroll down the page for loading all images

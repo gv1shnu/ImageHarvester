@@ -2,6 +2,8 @@ from tqdm import tqdm
 import requests
 import time
 import os
+import urllib.error
+import urllib.request
 
 
 class Downloader:
@@ -21,11 +23,13 @@ class Downloader:
             time.sleep(10)
             response = requests.get(img_url, stream=True)
 
+        ext = img_url[-3:]
+
         # get the total file size
         file_size = int(response.headers.get("Content-Length", 0))
         self.cnt += 1
         # get the file name
-        filename = os.path.join(path, f'image-{self.cnt}.png')
+        filename = os.path.join(path, f'image-{self.cnt}.{ext}')
 
         # progress bar, changing the unit to bytes instead of iteration (default by tqdm)
         progress = tqdm(response.iter_content(1024), f"Downloading {filename}", total=file_size, unit="B",
@@ -40,3 +44,10 @@ class Downloader:
 
     def restart(self):
         self.cnt = 0
+
+
+def write(src, dest):
+    try:
+        urllib.request.urlretrieve(url=src, filename=dest)
+    except urllib.error.HTTPError:
+        print("HTTPError at {}".format(src))
