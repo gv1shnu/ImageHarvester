@@ -8,6 +8,7 @@ import concurrent.futures
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver import Keys
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
@@ -27,6 +28,9 @@ class Extractor:
 
     def check(self, plink, param):
         return str(plink).find(param) >= 0
+
+    def get_all_website_urls(self, q):
+        return self.get_website_urls(q) + self.get_g_website_urls(q)
 
     def get_website_urls(self, q):
         param = ''
@@ -73,6 +77,40 @@ class Extractor:
             urls.append(img_url)
         x = get_domain(url)
         return {x: urls}
+
+    def get_g_website_urls(self, q):
+        """
+        Get URLs from google images
+        """
+        driver = webdriver.Chrome(options=self.chrome_options, service=self.driver_service)
+        driver.get('https://www.google.com/')
+        searchBox = driver.find_element(By.NAME, 'q')
+        searchBox.send_keys(q)
+        searchBox.send_keys(Keys.ENTER)
+        elem = driver.find_element(By.LINK_TEXT, 'Images')
+        elem.get_attribute('href')
+        elem.click()
+
+        # Scroll to load images
+        value = 0
+        for _i in range(4):
+            wait = 400
+            driver.execute_script("scrollBy(" + str(value) + "," + str(wait) + ");")
+            value += wait
+            time.sleep(2)
+
+        elem1 = driver.find_element(By.ID, 'islrg')
+        children_elems = elem1.find_elements(By.CSS_SELECTOR, '.islrc > div')
+        sub = []
+        for _elem in children_elems:
+            class_name = _elem.get_attribute('class')
+            if class_name == 'isv-r PNCib MSM1fd BUooTd':
+                anchor_tags = _elem.find_elements(By.TAG_NAME, 'a')
+                for anchor_tag in anchor_tags:
+                    class_name = anchor_tag.get_attribute('class')
+                    if class_name == "VFACy kGQAp sMi44c lNHeqe":
+                        sub.append(anchor_tag.get_attribute('href'))
+        return sub
 
 
 def get_domain(url):
@@ -127,7 +165,7 @@ class ImageHarvester:
 
     def get_images_from_web(self):
         base = os.path.join(self.folder, 'webpages')
-        refs = self.extractor.get_website_urls(self.q)
+        refs = self.extractor.get_all_website_urls(self.q)
         print(f"Found {len(refs)} websites")
         with concurrent.futures.ThreadPoolExecutor() as executor:
             ans = executor.map(self.extractor.get_images_from_webpage, refs)
