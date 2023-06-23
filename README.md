@@ -39,7 +39,7 @@ To use the ImageHarvester application:
 
 ## Contributing
 
-Contributions are welcome! If you have any suggestions, bug reports, or feature requests, please open an issue or submit a pull request. Make sure to follow the existing coding style and conventions.
+Contributions and code reviews are welcome!
 
 ## License
 
