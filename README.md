@@ -1,16 +1,16 @@
 # ImageHarvester
 
-ImageHarvester is a Python-based project, powered by Selenium, that lets you download as many images as possible from anywhere (well, mostly) on the web.
+ImageHarvester is a Python-based project, powered by Selenium, that lets you download as many images as possible from everywhere (well, mostly) on the web.
 
 ## Features
 - Download Images from:
      - Webpages
-     - Reddit
-     - Pinterest
+     - Reddit (in-progress)
+     - Pinterest (in-progress)
  
 ## Installation
 
-Follow these steps to set up and run the Page Sentinal application:
+Follow these steps to set up the Image Harvester application:
 
 1. Clone the repository:
 	
@@ -22,7 +22,7 @@ Follow these steps to set up and run the Page Sentinal application:
    		cd Imageharvester
 
 
-3. To run this project, make sure you have Python 3.11 and pip installed on your system. Install the required dependencies:
+3. To run this project, make sure you have Python 3.11 and pip installed on your system. Install the required dependencies using:
 	
 		pip install -r requirements.txt
 
@@ -35,7 +35,7 @@ To use the ImageHarvester application:
 
         python imageharvester.py
 
-- Enter the keywords for the images you want to download from web.
+- Enter the keywords for the images you want to search, download from web.
 
 ## Contributing
 
