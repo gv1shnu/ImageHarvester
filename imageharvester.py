@@ -12,9 +12,9 @@ class ImageHarvester:
         self.img_extractor = ImageExtractor()
         self.downloader = Downloader()
         self.curr_list = [
-            # {'param': '', 'f': 'websites', 'func': self.img_extractor.get_images_from_webpage},
+            {'param': '', 'f': 'websites', 'func': self.img_extractor.get_images_from_webpage},
             {'param': 'pinterest', 'f': 'pinterest', 'func': self.img_extractor.get_images_from_pinterest_page},
-            # {'param': 'reddit', 'f': 'reddit', 'func': self.img_extractor.get_images_from_reddit_page}
+            {'param': 'reddit', 'f': 'reddit', 'func': self.img_extractor.get_images_from_reddit_page}
         ]
 
     def get_images(self, f, param, func):
